@@ -7,6 +7,27 @@ from utils.controller import get_user_info, add_user, remove_user, update_user, 
 
 users:list=[]
 
+class User:
+    def __init__(self,name,surname,location,post):
+        self.name =name
+        self.surname=surname
+        self.location=location
+        self.post=post
+        self.coordinates=self.get_coordinates()
+        self.marker=map_widget.set_marker(self.coordinates[0],self.coordinates[1])
+
+    def get_coordinates(self) -> list:
+        import requests
+        from bs4 import BeautifulSoup
+        url = f"https://pl.wikipedia.org/wiki/{self.location}"
+        response = requests.get(url).text
+        response_html = BeautifulSoup(response, "html.parser")
+        longitude = float(response_html.select(".longitude")[1].text.replace(",", "."))
+        latitude = float(response_html.select(".latitude")[1].text.replace(",", "."))
+        print(longitude)
+        print(latitude)
+        return [latitude, longitude]
+
 
 
 def add_user():
