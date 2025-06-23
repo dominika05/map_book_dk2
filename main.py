@@ -1,9 +1,7 @@
 from tkinter import *
 
-
 import tkintermapview
-from utils.model import users
-from utils.controller import get_user_info, add_user, remove_user, update_user, get_map
+
 
 users:list=[]
 
@@ -35,7 +33,7 @@ def add_user():
     zmienna_nazwisko=entry_surname.get()
     zmienna_miejscowosc=entry_location.get()
     zmienna_post=entry_posts.get()
-    user={'name':zmienna_imie,'surname':zmienna_nazwisko,'location':zmienna_miejscowosc,'post':zmienna_post}
+    user=User(name=zmienna_imie,surname=zmienna_nazwisko,location=zmienna_miejscowosc,post=zmienna_post)
     users.append(user)
 
     entry_name.delete(0,END)
@@ -52,19 +50,20 @@ def add_user():
 def show_users():
     listbox_lista_obiketow.delete(0,END)
     for idx,user in enumerate(users):
-        listbox_lista_obiketow.insert(idx,f'{idx+1}. {user['name']} {user['surname']}')
+        listbox_lista_obiketow.insert(idx,f'{idx+1}. {user.name} {user.surname}')
 
 def remove_user():
     i=listbox_lista_obiketow.index(ACTIVE)
+    users[i].marker.delete()
     users.pop(i)
     show_users()
 
 def edit_user():
-    i=listbox_lista_obiketow.index(ACTIVE)
-    name=users[i]['name']
-    surname=users[i]['surname']
-    location=users[i]['location']
-    post=users[i]['post']
+    i = listbox_lista_obiketow.index(ACTIVE)
+    name = users[i].name
+    surname = users[i].surname
+    location = users[i].location
+    post = users[i].post
 
     entry_name.insert(0,name)
     entry_surname.insert(0,surname)
@@ -79,10 +78,10 @@ def update_user(i):
     new_location=entry_location.get()
     new_post=entry_posts.get()
 
-    users[i]['name']=new_name
-    users[i]['surname']=new_surname
-    users[i]['location']=new_location
-    users[i]['post']=new_post
+    users[i].name = new_name
+    users[i].surname = new_surname
+    users[i].location = new_location
+    users[i].post = new_post
 
     entry_name.delete(0,END)
     entry_surname.delete(0,END)
@@ -90,17 +89,17 @@ def update_user(i):
     entry_posts.delete(0,END)
     entry_name.focus()
 
-
+    button_dodaj_obiekt.config(text='zapisz', command=lambda: update_user(i))
     button_dodaj_obiekt.config(text='Dodaj obiekt',command=add_user)
     show_users()
 
 
 def show_user_details():
-    i=listbox_lista_obiketow.index(ACTIVE)
-    name=users[i]['name']
-    surname=users[i]['surname']
-    location=users[i]['location']
-    post=users[i]['post']
+    i = listbox_lista_obiketow.index(ACTIVE)
+    name = users[i].name
+    surname = users[i].surname
+    location = users[i].location
+    post = users[i].post
     label_szczegoly_name_wartosc.config(text=name)
     label_szczegoly_surname_wartosc.config(text=surname)
     label_szczegoly_location_wartosc.config(text=location)
@@ -111,27 +110,7 @@ root = Tk()
 root.geometry("1200x760")
 root.title("Map Book DK")
 
-def main():
 
-        while True:
-                print('============MENU=============')
-                print('0 - zakończ program')
-                print('1 - wyświetl co u znajomych')
-                print('2 - dodaj znajomego')
-                print('3 - usuń znajomego')
-                print('4 - zauktualizuj dane znajomego')
-                print('5 - Wygeneruj mapę znajomych')
-                print('=============================')
-                choice: str = input('wybierz opcję MENU: ')
-                if choice == '0': break
-                if choice == '1': get_user_info(users)
-                if choice == '2': add_user(users)
-                if choice == '3': remove_user(users)
-                if choice == '4': update_user(users)
-                if choice == '5': get_map(users)
-
-if __name__ == '__main__':
-   main()
 #ramka lista obiektow
 ramka_lista_obiektow=Frame(root)
 ramka_formularz=Frame(root)
@@ -148,11 +127,11 @@ label_lista_obiektow=Label(ramka_lista_obiektow, text="Lista użytkowników")
 label_lista_obiektow.grid(row=0, column=0,columnspan=3)
 listbox_lista_obiketow=Listbox(ramka_lista_obiektow, width=50, height=10)
 listbox_lista_obiketow.grid(row=1, column=0, columnspan=3)
-button_pokaz_szczegoly_obiektu=Button(ramka_lista_obiektow, text='Pokaż szczegóły')
+button_pokaz_szczegoly_obiektu=Button(ramka_lista_obiektow, text='Pokaż szczegóły', command=show_user_details)
 button_pokaz_szczegoly_obiektu.grid(row=2, column=0)
-button_usun_obiekt=Button(ramka_lista_obiektow, text='Usuń obiekt')
+button_usun_obiekt=Button(ramka_lista_obiektow, text='Usuń obiekt', command=remove_user)
 button_usun_obiekt.grid(row=2, column=1)
-button_edytuj_obiekt=Button(ramka_lista_obiektow, text='Edytuj obiekt')
+button_edytuj_obiekt=Button(ramka_lista_obiektow, text='Edytuj obiekt', command=edit_user)
 button_edytuj_obiekt.grid(row=2, column=2)
 
 # ramka_formularz
@@ -176,7 +155,7 @@ entry_location.grid(row=3, column=1)
 entry_posts=Entry(ramka_formularz)
 entry_posts.grid(row=4, column=1)
 
-button_dodaj_obiekt=Button(ramka_formularz, text='Dodaj obiekt')
+button_dodaj_obiekt=Button(ramka_formularz, text='Dodaj obiekt',command=add_user)
 button_dodaj_obiekt.grid(row=5, column=0, columnspan=2)
 
 # ramka_szczegoly_obiektow
